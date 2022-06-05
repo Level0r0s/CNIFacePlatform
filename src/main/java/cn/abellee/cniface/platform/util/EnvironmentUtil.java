@@ -1,4 +1,4 @@
-package cn.abellee.cniface.util;
+package cn.abellee.cniface.platform.util;
 
 import java.util.Objects;
 
