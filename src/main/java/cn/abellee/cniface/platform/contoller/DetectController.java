@@ -27,7 +27,7 @@ public class DetectController {
         this.detectService = detectService;
     }
 
-    @PostMapping()
+    @PostMapping("/face")
     public CNIFacePagedResponse<DetectResult> detect(@RequestBody DetectRequestDTO detectRequest){
         List<DetectResult> detectResults = detectService.detect(detectRequest);
         return CNIFacePagedResponse.ok(detectResults.size(), detectResults);
