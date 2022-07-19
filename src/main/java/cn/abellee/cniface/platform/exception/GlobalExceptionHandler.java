@@ -2,6 +2,7 @@ package cn.abellee.cniface.platform.exception;
 
 import cn.abellee.cniface.platform.domain.common.CNIFaceResponse;
 import cn.abellee.cniface.platform.domain.common.CNIFaceResponseCode;
+import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -28,6 +29,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CNIFaceException.class)
     public CNIFaceResponse<?> throwCustomException(CNIFaceException cnifaceException){
         log.error("[ @系统错误 ] " + cnifaceException.getMessage());
-        return CNIFaceResponse.error(cnifaceException.getCNIFaceResponseCode(), cnifaceException.getMessage());
+        return CNIFaceResponse.error(cnifaceException.getCode(), cnifaceException.getMessage());
     }
+
+
+    @ResponseBody
+    @ExceptionHandler(StatusRuntimeException.class)
+    public CNIFaceResponse<?> throwCustomException(StatusRuntimeException statusRuntimeException){
+        log.error("[ @CNIFace grpc Error ] " + statusRuntimeException.getMessage());
+        return CNIFaceResponse.error(CNIFaceResponseCode.CNIFACE_GRPC_ERROR, statusRuntimeException.getMessage());
+    }
+
 }

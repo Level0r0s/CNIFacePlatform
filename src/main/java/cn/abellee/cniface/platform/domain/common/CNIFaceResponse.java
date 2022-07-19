@@ -32,12 +32,21 @@ public class CNIFaceResponse<T> {
         return new CNIFaceResponse<>(CNIFaceResponseCode.OK, r);
     }
 
+    public static <R> CNIFaceResponse<R> error(int code, String message) {
+        return new CNIFaceResponse<>(code, message);
+    }
+
     public static <R> CNIFaceResponse<R> error(CNIFaceResponseCode cnifaceResponseCode, String message) {
         return new CNIFaceResponse<>(cnifaceResponseCode, message);
     }
 
     public static <R> CNIFaceResponse<R> error(CNIFaceResponseCode cnifaceResponseCode, String message, R r) {
         return new CNIFaceResponse<>(cnifaceResponseCode, message, r);
+    }
+
+    private CNIFaceResponse(int code, String message) {
+        this.code = code;
+        this.message = message;
     }
 
     private CNIFaceResponse(CNIFaceResponseCode cnifaceResponseCode, T t) {

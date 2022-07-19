@@ -14,14 +14,25 @@ import lombok.ToString;
 @Data
 public class CNIFaceException extends RuntimeException {
 
-    private CNIFaceResponseCode cniFaceResponseCode;
+    private int code;
+
+    private String message;
+
+    public CNIFaceException(CNIFaceResponseCode cniFaceResponseCode) {
+        this.code = cniFaceResponseCode.getCode();
+        this.message = cniFaceResponseCode.getDescription();
+    }
 
     public CNIFaceException(CNIFaceResponseCode cniFaceResponseCode, String message) {
         super(message);
-        this.cniFaceResponseCode = cniFaceResponseCode;
+        this.code = cniFaceResponseCode.getCode();
+        this.message = message != null && !message.isBlank() ? message : cniFaceResponseCode.getDescription();
     }
 
-    public CNIFaceResponseCode getCNIFaceResponseCode() {
-        return cniFaceResponseCode;
+    public CNIFaceException(int code, String message) {
+        super(message);
+        this.code = code;
+        this.message = message;
     }
+
 }

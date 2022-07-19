@@ -1,9 +1,7 @@
 package cn.abellee.cniface.platform.contoller;
 
-import cn.abellee.cniface.grpc.DetectResponse;
 import cn.abellee.cniface.platform.domain.common.CNIFacePagedResponse;
 import cn.abellee.cniface.platform.domain.dto.DetectRequestDTO;
-import cn.abellee.cniface.platform.domain.dto.DetectResponseDTO;
 import cn.abellee.cniface.platform.domain.dto.DetectResult;
 import cn.abellee.cniface.platform.service.IDetectService;
 import org.springframework.web.bind.annotation.PostMapping;

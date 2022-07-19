@@ -1,14 +1,11 @@
 package cn.abellee.cniface.platform.service.impl;
 
 import cn.abellee.cniface.grpc.*;
-import cn.abellee.cniface.platform.domain.dto.ExtractFeatureRequestDTO;
-import cn.abellee.cniface.platform.domain.dto.ExtractFeatureResponseDTO;
-import cn.abellee.cniface.platform.domain.dto.SimilarityRequestDTO;
-import cn.abellee.cniface.platform.domain.dto.SimilarityResponseDTO;
+import cn.abellee.cniface.platform.domain.dto.*;
+import cn.abellee.cniface.platform.exception.CNIFaceException;
 import cn.abellee.cniface.platform.service.IRecognitionService;
-import io.grpc.StatusRuntimeException;
+import cn.abellee.cniface.platform.service.cni.CNIFaceRecognitionService;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,50 +16,46 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class RecognitionServiceImpl implements IRecognitionService {
 
-    @GrpcClient("cniface")
-    private RecognitionServiceGrpc.RecognitionServiceBlockingStub recognitionServiceBlockingStub;
+    private final CNIFaceRecognitionService cniFaceRecognitionService;
+
+    public RecognitionServiceImpl(CNIFaceRecognitionService cniFaceRecognitionService) {
+        this.cniFaceRecognitionService = cniFaceRecognitionService;
+    }
+
+    private float similarityCal(float similarity) {
+        similarity = similarity < 0 ? 0 : similarity;
+        similarity = similarity > 1 ? 1 : similarity;
+        similarity = similarity * 100;
+        return similarity;
+    }
 
     @Override
     public ExtractFeatureResponseDTO extractFeature(ExtractFeatureRequestDTO extractFeatureRequestDTO) {
-        try {
-            ExtractFeatureRequest extractFeatureRequest = ExtractFeatureRequest.newBuilder()
-                    .addAllKps(extractFeatureRequestDTO.getKps())
-                    .setFaceImageBase64(extractFeatureRequestDTO.getFaceImageBase64())
-                    .build();
-            ExtractFeatureResponse extractFeatureResponse = recognitionServiceBlockingStub.extractFeature(extractFeatureRequest);
-            // TO DO extractFeatureResponse.getCode()
-            ExtractFeatureResponseDTO extractFeatureResponseDTO = new ExtractFeatureResponseDTO();
-            extractFeatureResponseDTO.setFeatureBase64(extractFeatureResponse.getFeatureBase64());
+        ExtractFeatureRequest extractFeatureRequest = ExtractFeatureRequest.newBuilder()
+                .addAllKps(extractFeatureRequestDTO.getKps())
+                .setFaceImageBase64(extractFeatureRequestDTO.getFaceImageBase64())
+                .build();
+        ExtractFeatureResponse extractFeatureResponse = cniFaceRecognitionService.extractFeature(extractFeatureRequest);
+        if (extractFeatureResponse.getCode() != 0) throw new CNIFaceException((int)extractFeatureResponse.getCode(), extractFeatureResponse.getMessage());
+        ExtractFeatureResponseDTO extractFeatureResponseDTO = new ExtractFeatureResponseDTO();
+        extractFeatureResponseDTO.setFeatureBase64(extractFeatureResponse.getFeatureBase64());
 
-            return extractFeatureResponseDTO;
-        } catch (final StatusRuntimeException e) {
-            log.error("FAILED with " + e.getStatus().getCode().name());
-            e.printStackTrace();
-        }
-        return null;
+        return extractFeatureResponseDTO;
     }
 
     @Override
     public SimilarityResponseDTO similarity(SimilarityRequestDTO similarityRequestDTO) {
-        try {
-            SimilarityRequest similarityRequest = SimilarityRequest.newBuilder()
-                    .setFeatureBase641(similarityRequestDTO.getFeatureBase64_1())
-                    .setFeatureBase642(similarityRequestDTO.getFeatureBase64_2())
-                    .build();
-            SimilarityeResponse similarityeResponse = recognitionServiceBlockingStub.similarity(similarityRequest);
-            // TO DO response.getCode()
-            float similarity = similarityeResponse.getSimilarity();
-            similarity = similarity < 0 ? 0 : similarity;
-            similarity = similarity > 1 ? 1 : similarity;
-            similarity = similarity * 100;
-
-            SimilarityResponseDTO similarityResponseDTO = new SimilarityResponseDTO();
-            similarityResponseDTO.setSimilarity(similarity);
-            return similarityResponseDTO;
-        } catch (final StatusRuntimeException e) {
-            log.error("FAILED with " + e.getStatus().getCode().name());
-            e.printStackTrace();
-        }
-        return null;
+        SimilarityRequest similarityRequest = SimilarityRequest.newBuilder()
+                .setFeatureBase641(similarityRequestDTO.getFeatureBase64_1())
+                .setFeatureBase642(similarityRequestDTO.getFeatureBase64_2())
+                .build();
+        SimilarityResponse similarityResponse = cniFaceRecognitionService.similarity(similarityRequest);
+        if (similarityResponse.getCode() != 0) throw new CNIFaceException((int)similarityResponse.getCode(), similarityResponse.getMessage());
+        float similarity = similarityResponse.getSimilarity();
+        similarity = similarityCal(similarity);
+        SimilarityResponseDTO similarityResponseDTO = new SimilarityResponseDTO();
+        similarityResponseDTO.setSimilarity(similarity);
+        return similarityResponseDTO;
     }
+
 }

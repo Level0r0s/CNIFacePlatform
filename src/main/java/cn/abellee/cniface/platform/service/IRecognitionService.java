@@ -1,9 +1,6 @@
 package cn.abellee.cniface.platform.service;
 
-import cn.abellee.cniface.platform.domain.dto.ExtractFeatureRequestDTO;
-import cn.abellee.cniface.platform.domain.dto.ExtractFeatureResponseDTO;
-import cn.abellee.cniface.platform.domain.dto.SimilarityRequestDTO;
-import cn.abellee.cniface.platform.domain.dto.SimilarityResponseDTO;
+import cn.abellee.cniface.platform.domain.dto.*;
 
 /**
  * @author abel
