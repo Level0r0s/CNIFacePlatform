@@ -1,14 +1,9 @@
 server:
-  port: 50011
+  port: 22605
 
 spring:
   application:
     name: cniface-platform
-  data:
-    mongodb:
-      uri: ${MONGO_DB_URI:mongodb://127.0.0.1:27017/cniface_platform}
-      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
-      auto-index-creation: true
   jackson:
 #    property-naming-strategy: SNAKE_CASE
     default-property-inclusion: NON_NULL
@@ -16,7 +11,7 @@ spring:
 grpc:
   client:
     cniface:
-      address: 'static://127.0.0.1:50001'
+      address: 'static://127.0.0.1:22506'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
