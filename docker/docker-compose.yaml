@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+
+  cniface:
+    image: abelleeye/cniface:v0.0.1
+    container_name: cniface
+    restart: always
+    command: cniface -m /models/
+    ports:
+      - 22506:22506
+
+  cniface-platform:
+    image: abelleeye/cniface-platform:v0.0.1
+    container_name: cniface-platform
+    restart: always
+    command: java -jar cniface-platform.jar
+    ports:
+      - 22605:22605
