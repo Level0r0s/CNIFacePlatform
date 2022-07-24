@@ -2,6 +2,8 @@ package cn.abellee.cniface.platform.domain.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author abel
  * @date 2022/6/6 7:39 PM
@@ -9,6 +11,6 @@ import lombok.Data;
 @Data
 public class ExtractFeatureResponseDTO {
 
-    private String featureBase64;
+    private List<Float> feature;
 
 }
