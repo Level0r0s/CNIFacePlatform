@@ -9,7 +9,7 @@ plugins {
 apply plugin: 'com.google.protobuf'
 
 group = 'cn.abellee.cniface'
-version = '0.0.1'
+//version = '0.0.1'
 sourceCompatibility = '11'
 
 configurations {

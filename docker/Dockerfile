@@ -1,6 +1,6 @@
 FROM openjdk:11.0.15-jre
 WORKDIR /
-COPY cniface-platform-0.0.1.jar /cniface-platform.jar
+COPY cniface-platform.jar /
 CMD ["java", \
         "-Xlog:gc=info:file=gc.log:uptime:filecount=2:filesize=512M", \
         "-XX:+PrintClassHistogram", \
