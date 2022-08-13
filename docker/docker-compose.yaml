@@ -12,6 +12,8 @@ services:
   cniface-platform:
     image: abelleeye/cniface-platform:v0.0.3
     container_name: cniface-platform
+    environment:
+      - CNIFACE_GRPC_ADDR=static://cniface:22506
     restart: always
     command: java -jar cniface-platform.jar
     ports:

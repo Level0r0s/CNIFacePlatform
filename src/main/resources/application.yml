@@ -11,7 +11,7 @@ spring:
 grpc:
   client:
     cniface:
-      address: 'static://127.0.0.1:22506'
+      address: ${CNIFACE_GRPC_ADDR:static://127.0.0.1:22506}
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
