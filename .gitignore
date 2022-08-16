@@ -39,3 +39,6 @@ out/
 proto/*.proto
 
 src/main/java/cn/abellee/cniface/grpc
+
+db/
+docker/volumes
