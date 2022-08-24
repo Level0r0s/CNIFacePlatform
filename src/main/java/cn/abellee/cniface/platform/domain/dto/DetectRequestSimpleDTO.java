@@ -4,10 +4,10 @@ import lombok.Data;
 
 /**
  * @author abel
- * @date 2022/6/5 5:36 PM
+ * @date 2022/8/24 5:47 PM
  */
 @Data
-public class DetectWithMaskRequestDTO {
+public class DetectRequestSimpleDTO {
 
     private String faceImageBase64;
 

@@ -1,7 +1,8 @@
 package cn.abellee.cniface.platform.contoller;
 
-import cn.abellee.cniface.platform.domain.common.CNIFacePagedResponse;
+import cn.abellee.cniface.platform.domain.common.CNIFaceResponse;
 import cn.abellee.cniface.platform.domain.dto.DetectRequestDTO;
+import cn.abellee.cniface.platform.domain.dto.DetectRequestSimpleDTO;
 import cn.abellee.cniface.platform.domain.dto.DetectResult;
 import cn.abellee.cniface.platform.service.IDetectService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,9 +27,10 @@ public class DetectController {
     }
 
     @PostMapping("/face")
-    public CNIFacePagedResponse<DetectResult> detect(@RequestBody DetectRequestDTO detectRequest){
-        List<DetectResult> detectResults = detectService.detect(detectRequest);
-        return CNIFacePagedResponse.ok(detectResults.size(), detectResults);
+    public CNIFaceResponse<List<DetectResult>> detect(@RequestBody DetectRequestSimpleDTO detectRequestSimpleDTO){
+        DetectRequestDTO detectRequestDTO = new DetectRequestDTO(detectRequestSimpleDTO);
+        List<DetectResult> detectResults = detectService.detect(detectRequestDTO);
+        return CNIFaceResponse.ok(detectResults);
     }
 
 

@@ -1,5 +1,3 @@
--- CREATE TABLE IF NOT EXISTS init_db(id int auto_increment primary key not null, is_init tyn);
-
 
 INSERT INTO users (id, username, password, activated) VALUES (1, 'admin', '$2a$08$lDnHPz7eUkSi6ao14Twuau08mzhWrL4kyZGGU5xfiGALO/Vxd5DOi', 1);
 INSERT INTO users (id, username, password, activated) VALUES (2, 'user', '$2a$08$UkVvwpULis18S19S5pZFn.YHPZt3oaqHZnDwqbCW9pft6uFtkXKDC', 1);

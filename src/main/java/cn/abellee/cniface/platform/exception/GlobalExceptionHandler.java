@@ -2,6 +2,7 @@ package cn.abellee.cniface.platform.exception;
 
 import cn.abellee.cniface.platform.domain.common.CNIFaceResponse;
 import cn.abellee.cniface.platform.domain.common.CNIFaceResponseCode;
+import cn.abellee.cniface.platform.milvus.MilvusException;
 import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,6 +19,7 @@ import java.util.Objects;
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
     @ResponseBody
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public CNIFaceResponse<?> throwCustomException(MethodArgumentNotValidException methodArgumentNotValidException){
@@ -38,6 +40,13 @@ public class GlobalExceptionHandler {
     public CNIFaceResponse<?> throwCustomException(StatusRuntimeException statusRuntimeException){
         log.error("[ @CNIFace grpc Error ] " + statusRuntimeException.getMessage());
         return CNIFaceResponse.error(CNIFaceResponseCode.CNIFACE_GRPC_ERROR, statusRuntimeException.getMessage());
+    }
+
+    @ResponseBody
+    @ExceptionHandler(MilvusException.class)
+    public CNIFaceResponse<?> throwCustomException(MilvusException milvusException){
+        log.error("[ @CNIFace milvus Error ] " + milvusException.getMessage());
+        return CNIFaceResponse.error(CNIFaceResponseCode.CNIFACE_GRPC_ERROR, milvusException.getMessage());
     }
 
 }

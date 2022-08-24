@@ -8,16 +8,17 @@ spring:
     default-property-inclusion: NON_NULL
     date-format: yyyy-MM-dd HH:mm:ss
   datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+
     driver-class-name: org.h2.Driver
     url: jdbc:h2:file:./db/cniface
     username: admin
     password: cniface
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     open-in-view: false
     show-sql: false
-    database-platform: org.hibernate.dialect.H2Dialect
   servlet:
     multipart:
       max-file-size: 10240MB

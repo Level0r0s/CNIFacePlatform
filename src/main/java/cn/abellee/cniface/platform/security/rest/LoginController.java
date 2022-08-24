@@ -6,6 +6,7 @@ import cn.abellee.cniface.platform.security.jwt.JWTFilter;
 import cn.abellee.cniface.platform.security.jwt.TokenProvider;
 import cn.abellee.cniface.platform.security.rest.dto.LoginDTO;
 import cn.abellee.cniface.platform.security.rest.dto.LoginResultDTO;
+import cn.abellee.cniface.platform.security.service.UserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,13 +35,22 @@ public class LoginController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    public LoginController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
+    private final UserService userService;
+
+    public LoginController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, UserService userService) {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.userService = userService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CNIFaceResponse<LoginResultDTO>> authorize(@Valid @RequestBody LoginDTO loginDto) {
+    public ResponseEntity<CNIFaceResponse<LoginResultDTO>> login(@Valid @RequestBody LoginDTO loginDto) {
+
+        if ("admin".equals(loginDto.getUsername())) {
+            if (!userService.existUserByUsername(loginDto.getUsername())) {
+                return ResponseEntity.ok(CNIFaceResponse.error(-10, "admin user not found!"));
+            }
+        }
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());

@@ -1,9 +1,7 @@
 package cn.abellee.cniface.platform.domain.dto;
 
-import lombok.Builder;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,6 +12,7 @@ import java.util.List;
 public class DetectResult {
 
     public DetectResult(cn.abellee.cniface.grpc.DetectResult detectResult) {
+        this.maskScore = detectResult.getMaskScore();
         this.score = detectResult.getScore();
         this.x = detectResult.getX();
         this.y = detectResult.getY();
@@ -21,6 +20,8 @@ public class DetectResult {
         this.h = detectResult.getH();
         this.kps = detectResult.getKpsList();
     }
+
+    private float maskScore;
 
     private float score;
 

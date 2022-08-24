@@ -56,7 +56,10 @@ public class WebSecurityConfigurer {
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/login").permitAll()
+                .antMatchers(
+                        "/login",
+                        "/init_and_register_admin"
+                ).permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers(
                         "/",
@@ -72,7 +75,6 @@ public class WebSecurityConfigurer {
                 .and()
                 .apply(securityConfigurerAdapter());
 
-//        httpSecurity.logout().logoutUrl("/logout").logoutSuccessHandler(rockstLogoutSuccessHandler);
         return httpSecurity.build();
     }
 

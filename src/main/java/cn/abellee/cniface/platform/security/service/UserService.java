@@ -22,9 +22,17 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    public boolean existUserByUsername(String username) {
+        return userRepository.existsUserByUsername(username);
+    }
+
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {
         return SecurityUtils.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername);
+    }
+
+    public User add(User user) {
+        return userRepository.save(user);
     }
 
 }
