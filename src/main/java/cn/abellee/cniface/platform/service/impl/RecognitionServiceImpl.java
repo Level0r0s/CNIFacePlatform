@@ -36,7 +36,7 @@ public class RecognitionServiceImpl implements IRecognitionService {
                 .setFaceImageBase64(extractFeatureRequestDTO.getFaceImageBase64())
                 .build();
         ExtractFeatureResponse extractFeatureResponse = cniFaceRecognitionService.extractFeature(extractFeatureRequest);
-        if (extractFeatureResponse.getCode() != 0) throw new CNIFaceException((int)extractFeatureResponse.getCode(), extractFeatureResponse.getMessage());
+        if (extractFeatureResponse.getCode() != 0) throw new CNIFaceException(extractFeatureResponse.getCode(), extractFeatureResponse.getMessage());
         ExtractFeatureResponseDTO extractFeatureResponseDTO = new ExtractFeatureResponseDTO();
         extractFeatureResponseDTO.setFeature(extractFeatureResponse.getFeatureList());
 
@@ -50,7 +50,7 @@ public class RecognitionServiceImpl implements IRecognitionService {
                 .addAllFeature2(similarityRequestDTO.getFeature2())
                 .build();
         SimilarityResponse similarityResponse = cniFaceRecognitionService.similarity(similarityRequest);
-        if (similarityResponse.getCode() != 0) throw new CNIFaceException((int)similarityResponse.getCode(), similarityResponse.getMessage());
+        if (similarityResponse.getCode() != 0) throw new CNIFaceException(similarityResponse.getCode(), similarityResponse.getMessage());
         float similarity = similarityResponse.getSimilarity();
         similarity = similarityCal(similarity);
         SimilarityResponseDTO similarityResponseDTO = new SimilarityResponseDTO();

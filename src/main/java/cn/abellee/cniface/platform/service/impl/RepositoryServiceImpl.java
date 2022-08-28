@@ -17,11 +17,11 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class RepositoryService implements IRepositoryService {
+public class RepositoryServiceImpl implements IRepositoryService {
 
     private final MilvusClientService milvusClientService;
 
-    public RepositoryService(MilvusClientService milvusClientService) {
+    public RepositoryServiceImpl(MilvusClientService milvusClientService) {
         this.milvusClientService = milvusClientService;
     }
 
