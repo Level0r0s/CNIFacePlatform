@@ -37,7 +37,7 @@ public class DetectServiceImpl implements IDetectService {
         );
 
 
-        if (detectResponse.getCode() != 0) throw new CNIFaceException((int)detectResponse.getCode(), detectResponse.getMessage());
+        if (detectResponse.getCode() != 0) throw new CNIFaceException(detectResponse.getCode(), detectResponse.getMessage());
         List<DetectResult> detectResults = new ArrayList<>();
         for (cn.abellee.cniface.grpc.DetectResult grpcDetectResult : detectResponse.getResultsList()) {
             DetectResult detectResult = new DetectResult(grpcDetectResult);

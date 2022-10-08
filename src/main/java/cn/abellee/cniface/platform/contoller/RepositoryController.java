@@ -1,8 +1,11 @@
 package cn.abellee.cniface.platform.contoller;
 
+import cn.abellee.cniface.platform.domain.common.CNIFacePagedResponse;
 import cn.abellee.cniface.platform.domain.common.CNIFaceResponse;
 import cn.abellee.cniface.platform.domain.dto.*;
 import cn.abellee.cniface.platform.service.IRepositoryService;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,9 +30,9 @@ public class RepositoryController {
         return CNIFaceResponse.ok();
     }
 
-    @DeleteMapping("/delete/{name}")
-    public CNIFaceResponse<?> delete(@PathVariable String name){
-        repositoryService.deleteRepository(name);
+    @PostMapping("/delete")
+    public CNIFaceResponse<?> delete(@RequestBody DeleteRepositoryRequestDTO deleteRepositoryRequestDTO){
+        repositoryService.deleteRepository(deleteRepositoryRequestDTO.getRepoName());
         return CNIFaceResponse.ok();
     }
 
@@ -38,4 +41,41 @@ public class RepositoryController {
         List<RepositoryResultDTO> repositoryResultDTOS = repositoryService.listRepositories();
         return CNIFaceResponse.ok(repositoryResultDTOS);
     }
+
+    @PostMapping("/item/insert")
+    public CNIFaceResponse<?> insertItem(@RequestBody RepositoryAddOrUpdateItemRequestDTO repositoryAddOrUpdateItemRequestDTO){
+        repositoryService.addOrUpdateItem(repositoryAddOrUpdateItemRequestDTO);
+        return CNIFaceResponse.ok();
+    }
+
+    @PostMapping("/item/delete")
+    public CNIFaceResponse<?> deleteItem(@RequestBody DeleteRepositoryItemRequestDTO deleteRepositoryItemRequestDTO){
+        repositoryService.deleteItem(deleteRepositoryItemRequestDTO.getRepoName(), deleteRepositoryItemRequestDTO.getId());
+        return CNIFaceResponse.ok();
+    }
+
+    @PostMapping("/item/retrieval")
+    public CNIFaceResponse<RepositorySearchResponseDTO> search(@RequestBody RepositorySearchRequestDTO repositorySearchRequestDTO){
+        RepositorySearchResponseDTO repositorySearchResponseDTO = repositoryService.search(repositorySearchRequestDTO);
+        return CNIFaceResponse.ok(repositorySearchResponseDTO);
+    }
+
+    @PostMapping("/item/query")
+    public CNIFacePagedResponse<RepositoryQueryResultDTO> listItem(@RequestBody RepositoryQueryRequestDTO repositoryQueryRequestDTO){
+        RepositoryQueryResponseDTO repositoryQueryResponseDTO = repositoryService.query(repositoryQueryRequestDTO);
+        return CNIFacePagedResponse.ok(repositoryQueryResponseDTO.getTotal(), repositoryQueryResponseDTO.getResults());
+    }
+
+    @GetMapping("/item/face_image/{repoId}/{id}")
+    public ResponseEntity<byte[]> faceImage(@PathVariable Long repoId, @PathVariable Long id){
+        byte[] faceImage = repositoryService.getFaceImage(repoId, id);
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(faceImage);
+    }
+
+    @GetMapping("/item/scene_image/{repoId}/{id}")
+    public ResponseEntity<byte[]> sceneImage(@PathVariable Long repoId, @PathVariable Long id){
+        byte[] sceneImage = repositoryService.getSceneImage(repoId, id);
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(sceneImage);
+    }
+
 }

@@ -8,11 +8,13 @@ import javax.persistence.*;
 
 /**
  * @author abel
- * @date 2022/8/20 9:27 PM
+ * @date 2022/10/3 8:31 PM
  */
 @Data
 @Entity
-@Table(name = "repositories", indexes = {@Index(name = "name", columnList = "create_time")})
+@Table(name = "repositories", indexes = {
+        @Index(name = "name_createTime", columnList = "name,create_time"),
+})
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class RepositoryEntity extends BaseTimeEntity {
@@ -21,7 +23,13 @@ public class RepositoryEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "total", nullable = false)
+    private Integer total;
+
+    public String getRepoNameInDB() {
+        return "repo_" + id;
+    }
 }

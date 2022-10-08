@@ -1,6 +1,6 @@
 package cn.abellee.cniface.platform.service;
 
-import cn.abellee.cniface.platform.domain.dto.RepositoryResultDTO;
+import cn.abellee.cniface.platform.domain.dto.*;
 
 import java.util.List;
 
@@ -10,9 +10,23 @@ import java.util.List;
  */
 public interface IRepositoryService {
 
-    void createRepository(String name);
+    void createRepository(String repoName);
 
     List<RepositoryResultDTO> listRepositories();
 
-    void deleteRepository(String name);
+    boolean existRepository(String repoName);
+
+    void deleteRepository(String repoName);
+
+    void addOrUpdateItem(RepositoryAddOrUpdateItemRequestDTO repositoryAddOrUpdateItemRequestDTO);
+
+    void deleteItem(String repoName, Long itemId);
+
+    RepositorySearchResponseDTO search(RepositorySearchRequestDTO repositorySearchRequestDTO);
+
+    RepositoryQueryResponseDTO query(RepositoryQueryRequestDTO repositoryQueryRequestDTO);
+
+    byte[] getFaceImage(Long repoId, Long id);
+
+    byte[] getSceneImage(Long repoId, Long id);
 }

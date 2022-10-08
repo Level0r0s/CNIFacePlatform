@@ -13,7 +13,9 @@ public class RepositoryResultDTO {
 
     private String name;
 
-    private Long total;
+    private Integer total;
 
     private Long createTime;
+
+    private Long updateTime;
 }

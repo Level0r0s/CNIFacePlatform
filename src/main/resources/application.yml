@@ -9,25 +9,21 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:./db/cniface
-    username: admin
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/cniface?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+    username: root
     password: cniface
   jpa:
     hibernate:
       ddl-auto: update
     open-in-view: false
     show-sql: false
+    database-platform: cn.abellee.cniface.platform.domain.entity.mysql.DefaultMySQL57InnoDBDialect
   servlet:
     multipart:
       max-file-size: 10240MB
       max-request-size: 10240MB
       resolve-lazily: true
-  h2:
-    console:
-      enabled: true
-
 
 grpc:
   client:
