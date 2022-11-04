@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class RepositoryQueryRequestDTO {
 
-    private String repoName;
+    private Long repoId;
 
     private String name;
 

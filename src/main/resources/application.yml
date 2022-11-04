@@ -29,11 +29,16 @@ grpc:
   client:
     cniface:
       address: ${CNIFACE_GRPC_ADDR:static://127.0.0.1:22506}
-      enableKeepAlive: true
-      keepAliveWithoutCalls: true
-      negotiationType: plaintext
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
 
 jwt:
-  base64-secret: ZmQ0ZGI5NjQ0MDQwY2I4MjMxY2Y3ZmI3MjdhN2ZmMjNhODViOTg1ZGE0NTBjMGM4NDA5NzYxMjdjOWMwYWRmZTBlZjlhNGY3ZTg4Y2U3YTE1ODVkZDU5Y2Y3OGYwZWE1NzUzNWQ2YjFjZDc0NGMxZWU2MmQ3MjY1NzJmNTE0MzI=
+  base64-secret: Y25pZmFjZUZhY2VQbGF0Zm9ybUp3dFRva2VuU2VjcmV0
   token-validity-in-seconds: 86400
-  token-validity-in-seconds-for-remember-me: 108000
+  token-validity-in-seconds-for-remember-me: 1080000
+
+cniface:
+  model:
+    detect: det_10g
+    recognition: w600k_r50

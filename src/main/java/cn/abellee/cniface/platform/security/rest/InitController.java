@@ -1,6 +1,7 @@
 package cn.abellee.cniface.platform.security.rest;
 
 import cn.abellee.cniface.platform.domain.common.CNIFaceResponse;
+import cn.abellee.cniface.platform.security.annotaion.AnonymousAccess;
 import cn.abellee.cniface.platform.security.rest.dto.RegisterAdminDTO;
 import cn.abellee.cniface.platform.security.service.InitService;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class InitController {
     }
 
 
+    @AnonymousAccess
     @PostMapping("/init_and_register_admin")
     public ResponseEntity<CNIFaceResponse<?>> initAndRegisterAdmin(@Valid @RequestBody RegisterAdminDTO registerAdminDTO) {
         initService.initAndRegisterAdmin(registerAdminDTO);

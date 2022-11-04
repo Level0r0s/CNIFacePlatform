@@ -34,7 +34,9 @@ public class RecognitionServiceImpl implements IRecognitionService {
         ExtractFeatureRequest extractFeatureRequest = ExtractFeatureRequest.newBuilder()
                 .addAllKps(extractFeatureRequestDTO.getKps())
                 .setFaceImageBase64(extractFeatureRequestDTO.getFaceImageBase64())
+                .setIsDoNormalizeL2(extractFeatureRequestDTO.getIsDoNormalizeL2())
                 .build();
+
         ExtractFeatureResponse extractFeatureResponse = cniFaceRecognitionService.extractFeature(extractFeatureRequest);
         if (extractFeatureResponse.getCode() != 0) throw new CNIFaceException(extractFeatureResponse.getCode(), extractFeatureResponse.getMessage());
         ExtractFeatureResponseDTO extractFeatureResponseDTO = new ExtractFeatureResponseDTO();

@@ -9,5 +9,5 @@ import lombok.Data;
 @Data
 public class DeleteRepositoryRequestDTO {
 
-    private String repoName;
+    private Long repoId;
 }

@@ -14,13 +14,13 @@ public interface IRepositoryService {
 
     List<RepositoryResultDTO> listRepositories();
 
-    boolean existRepository(String repoName);
+    boolean existRepository(Long repoId);
 
-    void deleteRepository(String repoName);
+    void deleteRepository(Long repoId);
 
     void addOrUpdateItem(RepositoryAddOrUpdateItemRequestDTO repositoryAddOrUpdateItemRequestDTO);
 
-    void deleteItem(String repoName, Long itemId);
+    void deleteItem(Long repoId, Long itemId);
 
     RepositorySearchResponseDTO search(RepositorySearchRequestDTO repositorySearchRequestDTO);
 

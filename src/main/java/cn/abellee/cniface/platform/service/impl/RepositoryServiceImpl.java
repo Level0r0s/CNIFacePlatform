@@ -59,7 +59,7 @@ public class RepositoryServiceImpl implements IRepositoryService {
 
     private final RepositoryRepository repositoryRepository;
 
-    private final Map<String, RepositoryEntity> repoName2RepositoryInDBMap;
+    private final Map<Long, RepositoryEntity> repoId2RepositoryInDBMap;
 
     public RepositoryServiceImpl(CNIFaceRepositoryService cniFaceRepositoryService, IDetectService detectService,
                                  IRecognitionService recognitionService, JdbcTemplate jdbcTemplate,
@@ -73,23 +73,20 @@ public class RepositoryServiceImpl implements IRepositoryService {
         assert jdbcTemplate.getDataSource() != null;
         namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 
-        repoName2RepositoryInDBMap = new ConcurrentHashMap<>();
+        repoId2RepositoryInDBMap = new ConcurrentHashMap<>();
     }
 
-    private RepositoryEntity repoName2Repository(String repoName) {
-        if (repoName2RepositoryInDBMap.containsKey(repoName)) {
-            return repoName2RepositoryInDBMap.get(repoName);
+    private RepositoryEntity getRepositoryById(Long repoId) {
+        if (repoId2RepositoryInDBMap.containsKey(repoId)) {
+            return repoId2RepositoryInDBMap.get(repoId);
         }
 
-        RepositoryEntity repositoryEntity = new RepositoryEntity();
-        repositoryEntity.setName(repoName);
-        Optional<RepositoryEntity> repositoryRepositoryOne = repositoryRepository.findOne(Example.of(repositoryEntity));
-        if (repositoryRepositoryOne.isEmpty()) {
+        Optional<RepositoryEntity> repositoryEntityOptional = repositoryRepository.findById(repoId);
+        if (repositoryEntityOptional.isEmpty()) {
             throw new CNIFaceException(CNIFaceResponseCode.VALID_ERROR, "人像库不存在");
         }
-        repositoryEntity = repositoryRepositoryOne.get();
-        repoName2RepositoryInDBMap.put(repoName, repositoryEntity);
-
+        RepositoryEntity repositoryEntity = repositoryEntityOptional.get();
+        repoId2RepositoryInDBMap.put(repoId, repositoryEntity);
         return repositoryEntity;
     }
 
@@ -145,17 +142,10 @@ public class RepositoryServiceImpl implements IRepositoryService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void deleteRepository(String repoName) {
-        RepositoryEntity repositoryEntity = new RepositoryEntity();
-        repositoryEntity.setName(repoName);
-        Optional<RepositoryEntity> repositoryRepositoryOne = repositoryRepository.findOne(Example.of(repositoryEntity));
-        if (repositoryRepositoryOne.isEmpty()) {
-            throw new CNIFaceException(CNIFaceResponseCode.VALID_ERROR, "人像库不存在");
-        }
-
-        repositoryEntity = repositoryRepositoryOne.get();
+    public void deleteRepository(Long repoId) {
+        RepositoryEntity repositoryEntity = getRepositoryById(repoId);
         repositoryRepository.deleteById(repositoryEntity.getId());
-        repoName2RepositoryInDBMap.remove(repoName);
+        repoId2RepositoryInDBMap.remove(repoId);
 
         DeleteRepositoryRequest deleteRepositoryRequest = DeleteRepositoryRequest.newBuilder()
                 .setRepoName(repositoryEntity.getRepoNameInDB())
@@ -180,8 +170,7 @@ public class RepositoryServiceImpl implements IRepositoryService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public void addOrUpdateItem(RepositoryAddOrUpdateItemRequestDTO repositoryAddOrUpdateItemRequestDTO) {
-        String repoName = repositoryAddOrUpdateItemRequestDTO.getRepoName();
-        RepositoryEntity repositoryEntity = repoName2Repository(repoName);
+        RepositoryEntity repositoryEntity = getRepositoryById(repositoryAddOrUpdateItemRequestDTO.getRepoId());
 
         DetectRequestDTO detectRequestDTO = new DetectRequestDTO();
         detectRequestDTO.setFaceImageBase64(repositoryAddOrUpdateItemRequestDTO.getImageBase64());
@@ -200,6 +189,7 @@ public class RepositoryServiceImpl implements IRepositoryService {
         ExtractFeatureRequestDTO extractFeatureRequestDTO = new ExtractFeatureRequestDTO();
         extractFeatureRequestDTO.setFaceImageBase64(repositoryAddOrUpdateItemRequestDTO.getImageBase64());
         extractFeatureRequestDTO.setKps(detectResult.getKps());
+        extractFeatureRequestDTO.setModel("");
         ExtractFeatureResponseDTO extractFeatureResponseDTO = recognitionService.extractFeature(extractFeatureRequestDTO);
         List<Float> feature = extractFeatureResponseDTO.getFeature();
 
@@ -224,7 +214,7 @@ public class RepositoryServiceImpl implements IRepositoryService {
         if (repositoryAddOrUpdateItemRequestDTO.getId() != null) {
             throw new CNIFaceException(CNIFaceResponseCode.NOT_SUPPORT);
         } else {
-            String sql = "INSERT INTO `" + repoNameInDB + "` (`name`, `person_id`, `feature`, `face_image`, `scene_image`, `create_time`) VALUES (?, ?, ?, ?, ?, ?);";
+            String sql = "INSERT INTO `" + repoNameInDB + "` (`name`, `person_id`, `feature`, `face_image`, `scene_image`, `timestamp`) VALUES (?, ?, ?, ?, ?, ?);";
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 // 指定主键
@@ -257,8 +247,8 @@ public class RepositoryServiceImpl implements IRepositoryService {
 
     @Override
     @Transactional
-    public void deleteItem(String repoName, Long itemId) {
-        RepositoryEntity repositoryEntity = repoName2Repository(repoName);
+    public void deleteItem(Long repoId, Long itemId) {
+        RepositoryEntity repositoryEntity = getRepositoryById(repoId);
 
         jdbcTemplate.update("DELETE FROM " + repositoryEntity.getRepoNameInDB() + " WHERE id=?", itemId);
 
@@ -273,10 +263,16 @@ public class RepositoryServiceImpl implements IRepositoryService {
         if (deleteItemResponse.getCode() != 0) throw new CNIFaceException(deleteItemResponse.getCode(), "cniface 删除元素失败");
     }
 
+    private float similarityCal(float similarity) {
+        similarity = similarity < 0 ? 0 : similarity;
+        similarity = similarity > 1 ? 1 : similarity;
+        similarity = similarity * 100;
+        return similarity;
+    }
+
     @Override
     public RepositorySearchResponseDTO search(RepositorySearchRequestDTO repositorySearchRequestDTO) {
-        String repoName = repositorySearchRequestDTO.getRepoName();
-        RepositoryEntity repositoryEntity = repoName2Repository(repoName);
+        RepositoryEntity repositoryEntity = getRepositoryById(repositorySearchRequestDTO.getRepoId());
 
         String repoNameInDB = repositoryEntity.getRepoNameInDB();
 
@@ -289,6 +285,7 @@ public class RepositoryServiceImpl implements IRepositoryService {
             DetectRequestDTO detectRequestDTO = new DetectRequestDTO();
             detectRequestDTO.setFaceImageBase64(repositorySearchRequestDTO.getImageBase64());
             detectRequestDTO.setScore(repositorySearchRequestDTO.getDetectScore());
+            detectRequestDTO.setIsReturnRecognitionSubImage(false);
             List<DetectResult> detectResults = detectService.detect(detectRequestDTO);
             if (detectResults.isEmpty()) {
                 throw new CNIFaceException(CNIFaceResponseCode.NO_FACE_DETECTED);
@@ -303,6 +300,7 @@ public class RepositoryServiceImpl implements IRepositoryService {
             ExtractFeatureRequestDTO extractFeatureRequestDTO = new ExtractFeatureRequestDTO();
             extractFeatureRequestDTO.setFaceImageBase64(repositorySearchRequestDTO.getImageBase64());
             extractFeatureRequestDTO.setKps(detectResult.getKps());
+            extractFeatureRequestDTO.setModel("w600k_mbf");
             ExtractFeatureResponseDTO extractFeatureResponseDTO = recognitionService.extractFeature(extractFeatureRequestDTO);
             feature = extractFeatureResponseDTO.getFeature();
         }
@@ -317,11 +315,14 @@ public class RepositoryServiceImpl implements IRepositoryService {
 
         List<Long> ids = searchResponse.getResultsList().stream().map(SearchResponseItem::getId).collect(Collectors.toList());
 
+        RepositorySearchResponseDTO repositorySearchResponseDTO = new RepositorySearchResponseDTO();
+        if (ids.isEmpty()) return repositorySearchResponseDTO;
+        
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("ids", ids);
 
         List<FaceEntity> faceEntities = namedParameterJdbcTemplate.query(
-                "SELECT id,name,person_id,create_time FROM " + repoNameInDB + " WHERE id IN (:ids)",
+                "SELECT id,name,person_id,timestamp FROM " + repoNameInDB + " WHERE id IN (:ids)",
                 parameters,
                 new FaceEntityRowMapper());
         Map<Long, FaceEntity> faceEntityMap = faceEntities.stream().collect(
@@ -337,40 +338,42 @@ public class RepositoryServiceImpl implements IRepositoryService {
             repositorySearchResultDTO.setId(id);
             repositorySearchResultDTO.setName(faceEntity.getName());
             repositorySearchResultDTO.setPersonId(faceEntity.getPersonId());
-            repositorySearchResultDTO.setScore(score);
+            repositorySearchResultDTO.setScore(similarityCal(score));
             repositorySearchResultDTOS.add(repositorySearchResultDTO);
         }
 
-        RepositorySearchResponseDTO repositorySearchResponseDTO = new RepositorySearchResponseDTO();
+
         repositorySearchResponseDTO.setResults(repositorySearchResultDTOS);
         return repositorySearchResponseDTO;
     }
 
     @Override
     public RepositoryQueryResponseDTO query(RepositoryQueryRequestDTO repositoryQueryRequestDTO) {
-        String repoName = repositoryQueryRequestDTO.getRepoName();
-        RepositoryEntity repositoryEntity = repoName2Repository(repoName);
+        RepositoryEntity repositoryEntity = getRepositoryById(repositoryQueryRequestDTO.getRepoId());
 
         String repoNameInDB = repositoryEntity.getRepoNameInDB();
-        String querySql = "SELECT id,name,person_id,create_time FROM " + repoNameInDB + " WHERE";
-        String countSql = "SELECT count(1) FROM " + repoNameInDB + " WHERE";
-        if (repositoryQueryRequestDTO.getName() != null) {
-            querySql += " name='" + repositoryQueryRequestDTO.getName() + "'";
-            countSql += " name='" + repositoryQueryRequestDTO.getName() + "'";
+        String querySql = "SELECT id,name,person_id,timestamp FROM " + repoNameInDB;
+        String countSql = "SELECT count(1) FROM " + repoNameInDB;
+
+        String whereSql = "";
+        if (repositoryQueryRequestDTO.getName() != null && !repositoryQueryRequestDTO.getName().isBlank()) {
+            whereSql += " name='" + repositoryQueryRequestDTO.getName() + "'";
         }
-        if (repositoryQueryRequestDTO.getPersonId() != null) {
-            querySql += " person_id='" + repositoryQueryRequestDTO.getPersonId() + "'";
-            countSql += " person_id='" + repositoryQueryRequestDTO.getPersonId() + "'";
+        if (repositoryQueryRequestDTO.getPersonId() != null && !repositoryQueryRequestDTO.getPersonId().isBlank()) {
+            whereSql += " person_id='" + repositoryQueryRequestDTO.getPersonId() + "'";
         }
-        if (repositoryQueryRequestDTO.getStartTimestamp() != null) {
-            querySql += " AND create_time>=" + repositoryQueryRequestDTO.getStartTimestamp();
-            countSql += " AND create_time>=" + repositoryQueryRequestDTO.getStartTimestamp();
+        if (repositoryQueryRequestDTO.getStartTimestamp() != null && repositoryQueryRequestDTO.getStartTimestamp() > 0) {
+            whereSql += " AND timestamp>=" + repositoryQueryRequestDTO.getStartTimestamp();
         }
-        if (repositoryQueryRequestDTO.getEndTimestamp() != null) {
-            querySql += " AND create_time<=" + repositoryQueryRequestDTO.getEndTimestamp();
-            countSql += " AND create_time<=" + repositoryQueryRequestDTO.getEndTimestamp();
+        if (repositoryQueryRequestDTO.getEndTimestamp() != null&& repositoryQueryRequestDTO.getEndTimestamp() > 0) {
+            whereSql += " AND timestamp<=" + repositoryQueryRequestDTO.getEndTimestamp();
         }
-        querySql += " ORDER BY create_time DESC";
+        if (!whereSql.isBlank()) {
+            querySql += " WHERE" + whereSql;
+            countSql += " WHERE" + whereSql;
+        }
+
+        querySql += " ORDER BY timestamp DESC";
 
         Integer page = repositoryQueryRequestDTO.getPage();
         Integer size = repositoryQueryRequestDTO.getSize();
@@ -389,7 +392,7 @@ public class RepositoryServiceImpl implements IRepositoryService {
             repositoryQueryResultDTO.setId(faceEntity.getId());
             repositoryQueryResultDTO.setName(faceEntity.getName());
             repositoryQueryResultDTO.setPersonId(faceEntity.getPersonId());
-            repositoryQueryResultDTO.setTimestamp(faceEntity.getCreateTime());
+            repositoryQueryResultDTO.setTimestamp(faceEntity.getTimestamp());
             repositoryQueryResultDTOS.add(repositoryQueryResultDTO);
         }
         repositoryQueryResponseDTO.setResults(repositoryQueryResultDTOS);
@@ -411,10 +414,8 @@ public class RepositoryServiceImpl implements IRepositoryService {
     }
 
     @Override
-    public boolean existRepository(String repoName) {
-        RepositoryEntity repositoryEntity = new RepositoryEntity();
-        repositoryEntity.setName(repoName);
-        return repositoryRepository.exists(Example.of(repositoryEntity));
+    public boolean existRepository(Long repoId) {
+        return repositoryRepository.existsById(repoId);
     }
 
     @Override

@@ -12,4 +12,6 @@ public class DetectRequestSimpleDTO {
     private String faceImageBase64;
 
     private float score;
+
+    private Boolean isReturnRecognitionSubImage = true;
 }

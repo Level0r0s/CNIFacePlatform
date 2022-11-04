@@ -2,6 +2,7 @@ package cn.abellee.cniface.platform.security.rest;
 
 
 import cn.abellee.cniface.platform.domain.common.CNIFaceResponse;
+import cn.abellee.cniface.platform.security.annotaion.AnonymousAccess;
 import cn.abellee.cniface.platform.security.jwt.JWTFilter;
 import cn.abellee.cniface.platform.security.jwt.TokenProvider;
 import cn.abellee.cniface.platform.security.rest.dto.LoginDTO;
@@ -43,6 +44,7 @@ public class LoginController {
         this.userService = userService;
     }
 
+    @AnonymousAccess
     @PostMapping("/login")
     public ResponseEntity<CNIFaceResponse<LoginResultDTO>> login(@Valid @RequestBody LoginDTO loginDto) {
 

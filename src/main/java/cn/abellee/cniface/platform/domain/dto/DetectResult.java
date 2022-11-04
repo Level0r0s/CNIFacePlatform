@@ -19,6 +19,7 @@ public class DetectResult {
         this.w = detectResult.getW();
         this.h = detectResult.getH();
         this.kps = detectResult.getKpsList();
+        this.subImageBase64 = detectResult.getSubImageBase64();
     }
 
     private float maskScore;
@@ -34,4 +35,6 @@ public class DetectResult {
     private float h;
 
     private List<Float> kps;
+
+    private String subImageBase64;
 }

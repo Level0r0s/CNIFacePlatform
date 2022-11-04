@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class RepositorySearchRequestDTO {
 
-    private String repoName;
+    private Long repoId;
 
     private Integer topk;
 

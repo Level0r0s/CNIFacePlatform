@@ -3,6 +3,7 @@ package cn.abellee.cniface.platform.contoller;
 import cn.abellee.cniface.platform.domain.common.CNIFacePagedResponse;
 import cn.abellee.cniface.platform.domain.common.CNIFaceResponse;
 import cn.abellee.cniface.platform.domain.dto.*;
+import cn.abellee.cniface.platform.security.annotaion.AnonymousAccess;
 import cn.abellee.cniface.platform.service.IRepositoryService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class RepositoryController {
 
     @PostMapping("/delete")
     public CNIFaceResponse<?> delete(@RequestBody DeleteRepositoryRequestDTO deleteRepositoryRequestDTO){
-        repositoryService.deleteRepository(deleteRepositoryRequestDTO.getRepoName());
+        repositoryService.deleteRepository(deleteRepositoryRequestDTO.getRepoId());
         return CNIFaceResponse.ok();
     }
 
@@ -50,14 +51,14 @@ public class RepositoryController {
 
     @PostMapping("/item/delete")
     public CNIFaceResponse<?> deleteItem(@RequestBody DeleteRepositoryItemRequestDTO deleteRepositoryItemRequestDTO){
-        repositoryService.deleteItem(deleteRepositoryItemRequestDTO.getRepoName(), deleteRepositoryItemRequestDTO.getId());
+        repositoryService.deleteItem(deleteRepositoryItemRequestDTO.getRepoId(), deleteRepositoryItemRequestDTO.getItemId());
         return CNIFaceResponse.ok();
     }
 
     @PostMapping("/item/retrieval")
-    public CNIFaceResponse<RepositorySearchResponseDTO> search(@RequestBody RepositorySearchRequestDTO repositorySearchRequestDTO){
+    public CNIFacePagedResponse<RepositorySearchResultDTO> search(@RequestBody RepositorySearchRequestDTO repositorySearchRequestDTO){
         RepositorySearchResponseDTO repositorySearchResponseDTO = repositoryService.search(repositorySearchRequestDTO);
-        return CNIFaceResponse.ok(repositorySearchResponseDTO);
+        return CNIFacePagedResponse.ok(repositorySearchResponseDTO.getResults().size(), repositorySearchResponseDTO.getResults());
     }
 
     @PostMapping("/item/query")
@@ -66,12 +67,14 @@ public class RepositoryController {
         return CNIFacePagedResponse.ok(repositoryQueryResponseDTO.getTotal(), repositoryQueryResponseDTO.getResults());
     }
 
+    @AnonymousAccess
     @GetMapping("/item/face_image/{repoId}/{id}")
     public ResponseEntity<byte[]> faceImage(@PathVariable Long repoId, @PathVariable Long id){
         byte[] faceImage = repositoryService.getFaceImage(repoId, id);
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(faceImage);
     }
 
+    @AnonymousAccess
     @GetMapping("/item/scene_image/{repoId}/{id}")
     public ResponseEntity<byte[]> sceneImage(@PathVariable Long repoId, @PathVariable Long id){
         byte[] sceneImage = repositoryService.getSceneImage(repoId, id);

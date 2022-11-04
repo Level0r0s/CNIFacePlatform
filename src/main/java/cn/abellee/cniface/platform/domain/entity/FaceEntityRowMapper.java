@@ -1,6 +1,7 @@
 package cn.abellee.cniface.platform.domain.entity;
 
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.lang.NonNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,7 +25,7 @@ public class FaceEntityRowMapper implements RowMapper<FaceEntity> {
     }
 
     @Override
-    public FaceEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public FaceEntity mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
         FaceEntity faceEntity = new FaceEntity();
         if (isExistColumn(rs, "id")) {
             faceEntity.setId((long)rs.getInt("id"));
@@ -37,6 +38,9 @@ public class FaceEntityRowMapper implements RowMapper<FaceEntity> {
         }
         if (isExistColumn(rs, "feature")) {
             faceEntity.setFeature(rs.getString("feature"));
+        }
+        if (isExistColumn(rs, "timestamp")) {
+            faceEntity.setTimestamp(rs.getLong("timestamp"));
         }
         if (isExistColumn(rs, "face_image")) {
             faceEntity.setFaceImage(rs.getBytes("face_image"));

@@ -23,6 +23,7 @@ public class DetectServiceImpl implements IDetectService {
 
     private final CNIFaceDetectService cniFaceDetectService;
 
+
     public DetectServiceImpl(CNIFaceDetectService cniFaceDetectService) {
         this.cniFaceDetectService = cniFaceDetectService;
     }
@@ -33,6 +34,7 @@ public class DetectServiceImpl implements IDetectService {
                 DetectRequest.newBuilder()
                         .setFaceImageBase64(detectRequest.getFaceImageBase64())
                         .setScore(detectRequest.getScore())
+                        .setIsReturnRecognitionSubImage(detectRequest.getIsReturnRecognitionSubImage())
                         .build()
         );
 

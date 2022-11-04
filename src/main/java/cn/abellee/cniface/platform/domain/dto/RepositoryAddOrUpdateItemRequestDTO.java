@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class RepositoryAddOrUpdateItemRequestDTO {
 
-    private String repoName;
+    private Long repoId;
 
     private Integer id;
 

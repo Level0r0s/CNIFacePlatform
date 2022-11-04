@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class DeleteRepositoryItemRequestDTO {
 
-    private String repoName;
+    private Long repoId;
 
-    private Long id;
+    private Long itemId;
 }

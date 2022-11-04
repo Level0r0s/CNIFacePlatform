@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 @Data
 @Entity
 @Table(name = "repo", indexes = {
-        @Index(name = "name_createTime", columnList = "name,create_time"),
-        @Index(name = "personId_createTime", columnList = "person_id,create_time")
+        @Index(name = "name_timestamp", columnList = "name,timestamp"),
+        @Index(name = "personId_timestamp", columnList = "person_id,timestamp")
 })
 @ToString
 public class FaceEntity {
@@ -46,8 +46,8 @@ public class FaceEntity {
     @Column(name = "scene_image", nullable = false)
     private byte[] sceneImage;
 
-    @Column(name = "create_time")
-    private Long createTime;
+    @Column(name = "timestamp")
+    private Long timestamp;
 
     public List<Float> getFeature() {
         return featureStringToList(this.feature);

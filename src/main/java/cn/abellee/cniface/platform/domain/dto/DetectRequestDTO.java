@@ -14,6 +14,7 @@ public class DetectRequestDTO {
     public DetectRequestDTO(DetectRequestSimpleDTO detectRequestSimpleDTO) {
         this.faceImageBase64 = detectRequestSimpleDTO.getFaceImageBase64();
         this.score = detectRequestSimpleDTO.getScore();
+        this.isReturnRecognitionSubImage = detectRequestSimpleDTO.getIsReturnRecognitionSubImage();
     }
 
     private String model;
@@ -21,4 +22,6 @@ public class DetectRequestDTO {
     private String faceImageBase64;
 
     private float score;
+
+    private Boolean isReturnRecognitionSubImage;
 }
